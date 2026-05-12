@@ -128,8 +128,21 @@
 const textarea = document.querySelector(".input-box");
 const counter = document.querySelector(".counter");
 const sendBtn = document.querySelector(".send-btn");
+const textTop = document.querySelector(".text-top");
 
 const MAX = 32;
+
+// ================= HEADER STATES =================
+const DEFAULT_TEXT = "       ,,,<br>Hey! \\(•ᴗ•)/";
+const ACTIVE_TEXT  = "       ,,,✦<br>Hey! \\(-ᴗ-)/";
+
+function animateHeader() {
+  textTop.innerHTML = ACTIVE_TEXT;
+
+  setTimeout(() => {
+    textTop.innerHTML = DEFAULT_TEXT;
+  }, 600);
+}
 
 // ================= UI =================
 function updateUI() {
@@ -140,7 +153,8 @@ function updateUI() {
 
 // ================= SEND =================
 async function sendMessage() {
-    console.log("SEND");
+  console.log("SEND");
+
   const text = textarea.value.trim();
   if (!text) return;
 
@@ -156,13 +170,16 @@ async function sendMessage() {
       body: JSON.stringify({ text })
     });
 
-    // 🔥 ЖЁСТКАЯ ОЧИСТКА (важно)
+    // clear input
     textarea.value = "";
-    textarea.textContent = "";   // страховка
-    textarea.dispatchEvent(new Event("input")); // принудительно обновляем UI
+    textarea.textContent = "";
+    textarea.dispatchEvent(new Event("input"));
 
     textarea.blur();
     updateUI();
+
+    // ✦ animation trigger
+    animateHeader();
 
   } catch (e) {
     console.log("SEND ERROR", e);
@@ -170,8 +187,6 @@ async function sendMessage() {
 }
 
 // ================= EVENTS =================
-
-// ввод
 textarea.addEventListener("input", () => {
   if (textarea.value.length > MAX) {
     textarea.value = textarea.value.slice(0, MAX);
@@ -179,10 +194,8 @@ textarea.addEventListener("input", () => {
   updateUI();
 });
 
-// кнопка
 sendBtn.addEventListener("click", sendMessage);
 
-// Enter → send
 textarea.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
